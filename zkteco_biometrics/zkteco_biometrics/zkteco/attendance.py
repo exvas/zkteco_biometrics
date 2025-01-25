@@ -4,7 +4,7 @@ from zk import ZK, const
 def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_device_on_fetch=False):
     conn = None
     try:
-        zk = ZK(ip="ip", port=port, timeout=timeout)
+        zk = ZK(ip="ip", port=int(port), timeout=int(timeout))
         conn = zk.connect()
         disable_device = None
         attendance = None
