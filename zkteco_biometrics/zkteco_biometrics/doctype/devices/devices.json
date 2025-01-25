@@ -8,7 +8,8 @@
   "device_id",
   "punch_direction",
   "column_break_flvz",
-  "ip"
+  "ip",
+  "clear_device_log"
  ],
  "fields": [
   {
@@ -34,11 +35,17 @@
    "fieldtype": "Select",
    "label": "Punch Direction",
    "options": "IN\nOUT\nAUTO\nNone"
+  },
+  {
+   "default": "0",
+   "fieldname": "clear_device_log",
+   "fieldtype": "Check",
+   "label": "Clear Device Log"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-27 14:21:37.662231",
+ "modified": "2025-01-25 17:41:04.217711",
  "modified_by": "Administrator",
  "module": "ZKTeco Biometrics",
  "name": "Devices",
