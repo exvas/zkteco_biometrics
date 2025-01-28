@@ -22,7 +22,9 @@ def get_attendance_by_device(device_id, ip_address, clear_device_log:bool, port=
 
 	log_doc = frappe.new_doc("ZKTeco")
 	log_doc.title = datetime.now()
-	log_doc.attendance = json.dumps(data.get("attendance")[0:5]) if data.get("attendance") else ""
+	log = str(data.get("attendance")[-1].user_id) + " " + str(data.get("attendance")[-1].timestamp)
+	log_doc.attendance = log
+	# log_doc.attendance = json.dumps(data.get("attendance")[0:5]) if data.get("attendance") else ""
 	log_doc.disable_device = str(data.get("disable_device")) if data.get("disable_device") else ""
 	log_doc.enable_device = str(data.get("enable_device")) if data.get("disable_device") else ""
 	log_doc.clear_device = str(data.get("clear_attendance")) if data.get("clear_attendance") else ""
