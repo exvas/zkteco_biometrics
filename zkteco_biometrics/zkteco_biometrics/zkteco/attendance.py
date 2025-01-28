@@ -58,7 +58,7 @@ def get_attendance_by_device():
                         attendance = frappe.new_doc("Employee Checkin")
                         attendance.employee = employee
                         attendance.time = i.timestamp
-                        attendance.log_type = punchMap[data.punch]
+                        attendance.log_type = punchMap[i.punch]
                         attendance.device_id = device.device_id
                         attendance.insert()
     except Exception as e:
