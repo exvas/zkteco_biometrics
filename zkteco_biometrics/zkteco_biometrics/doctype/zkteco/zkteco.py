@@ -5,6 +5,7 @@ import frappe
 from frappe.model.document import Document
 from datetime import datetime
 from zkteco_biometrics.zkteco_biometrics.zkteco.attendance import get_attendance
+import json
 
 class ZKTeco(Document):
 	pass
@@ -21,7 +22,7 @@ def get_attendance_by_device(device_id, ip_address, clear_device_log:bool, port=
 
 	log_doc = frappe.new_doc("ZKTeco")
 	log_doc.title = datetime.now()
-	log_doc.attendance = data.get("attendance")[0:5] if data.get("attendance") else ""
+	log_doc.attendance = json.dumps(data.get("attendance")[0:5]) if data.get("attendance") else ""
 	log_doc.disable_device = str(data.get("disable_device")) if data.get("disable_device") else ""
 	log_doc.enable_device = str(data.get("enable_device")) if data.get("disable_device") else ""
 	log_doc.clear_device = str(data.get("clear_attendance")) if data.get("clear_attendance") else ""
