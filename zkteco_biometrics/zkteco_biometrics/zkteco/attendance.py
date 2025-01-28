@@ -37,7 +37,7 @@ punchMap = {
 
 @frappe.whitelist()
 def get_attendance_by_device():
-    devices = frappe.db.get_all("Devices", {"disable_data_capture": False})
+    devices = frappe.db.get_all("Devices", {"disable_data_capture": False}, ["*"])
     try:
         for device in devices:
             attn_data = get_attendance(
