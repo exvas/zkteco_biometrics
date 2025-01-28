@@ -1,5 +1,6 @@
 import frappe
 from zk import ZK, const
+from datetime import datetime
 
 def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_device_on_fetch=False):
     conn = None
@@ -19,7 +20,6 @@ def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_dev
         return {"attendance": attendance, "disable_device": disable_device, "clear_attendance": clear_attendance, "enable_device": enable_device}
     except Exception as e:
         frappe.log_error(message=e,title="Zkteco - Get Attendance")
-        frappe.throw("Something wrong! Please check error log.")
     finally:
         if conn:
             conn.disconnect()
@@ -44,14 +44,17 @@ def get_attendance_by_device():
             if data:
                 data = data[::-1]
                 for i in data:
-                    employee = frappe.db.get_value("Employee", {"attendance_device_id": data.user_id}, "name")
+                    if not i.timestamp.strftime("%Y-%m-%d") == datetime.now().strftime("%Y-%m-%d"):
+                        frappe.log_error(message=i.timestamp.strftime("%Y-%m-%d").format(i.user_id), title="Zkteco - Scheduler")
+                        break
+                    employee = frappe.db.get_value("Employee", {"attendance_device_id": i.user_id}, "name")
                     if not employee:
-                        frappe.log_error(message="Orphaned user id: {0}".format(data.user_id), title="Zkteco - Scheduler")
+                        frappe.log_error(message="Orphaned user id: {0}".format(i.user_id), title="Zkteco - Scheduler")
                         continue
                     if not frappe.db.exists("Employee Checkin", {"time": data.timestamp, "employee": employee}):
                         attendance = frappe.new_doc("Employee Checkin")
                         attendance.employee = employee
-                        attendance.time = data.timestamp
+                        attendance.time = i.timestamp
                         attendance.log_type = punchMap[data.punch]
                         attendance.device_id = device.device_id
                         attendance.insert()
