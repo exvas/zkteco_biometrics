@@ -9,6 +9,7 @@ def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_dev
         zk = ZK(ip=ip, port=int(port), timeout=int(timeout))
         frappe.log_error(message="10",title="Zkteco - Get Attendance")
         conn = zk.connect()
+        frappe.log_error(message="12",title="Zkteco - Get Attendance")
         disable_device = None
         attendance = None
         enable_device = None
@@ -46,7 +47,9 @@ def get_attendance_by_device():
                 device_id=device.device_id,
                 clear_from_device_on_fetch=device.clear_device_log
             )
-            data = attn_data.get("attendance")
+            data = []
+            if attn_data:
+                data = attn_data.get("attendance")
             if data:
                 data = data[::-1]
                 for i in data:
