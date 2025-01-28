@@ -9,7 +9,8 @@
   "punch_direction",
   "column_break_flvz",
   "ip",
-  "clear_device_log"
+  "clear_device_log",
+  "disable_data_capture"
  ],
  "fields": [
   {
@@ -41,11 +42,17 @@
    "fieldname": "clear_device_log",
    "fieldtype": "Check",
    "label": "Clear Device Log"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_data_capture",
+   "fieldtype": "Check",
+   "label": "Disable Data Capture"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-25 17:41:04.217711",
+ "modified": "2025-01-28 23:51:49.873316",
  "modified_by": "Administrator",
  "module": "ZKTeco Biometrics",
  "name": "Devices",
