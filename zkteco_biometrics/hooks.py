@@ -148,23 +148,28 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"zkteco_biometrics.tasks.all"
-# 	],
-# 	"daily": [
-# 		"zkteco_biometrics.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"zkteco_biometrics.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"zkteco_biometrics.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"zkteco_biometrics.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+    "cron": {
+        "* * * * *": [
+            "zkteco_biometrics.zkteco_biometrics.zkteco.attendance.get_attendance_by_device"
+        ]
+    }
+	# "all": [
+	# 	"zkteco_biometrics.tasks.all"
+	# ],
+	# "daily": [
+	# 	"zkteco_biometrics.tasks.daily"
+	# ],
+	# "hourly": [
+	# 	"zkteco_biometrics.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"zkteco_biometrics.tasks.weekly"
+	# ],
+	# "monthly": [
+	# 	"zkteco_biometrics.tasks.monthly"
+	# ],
+}
 
 # Testing
 # -------

@@ -23,3 +23,37 @@ def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_dev
     finally:
         if conn:
             conn.disconnect()
+        
+punchMap = {
+    0: "IN",
+    1: "OUT"
+}
+
+@frappe.whitelist()
+def get_attendance_by_device():
+    devices = frappe.db.get_all("Devices", {"disable_data_capture": False})
+    for device in devices:
+        try:
+            data = get_attendance(
+                ip=device.ip,
+                port=4370,
+                timeout=30, 
+                device_id=device.device_id,
+                clear_from_device_on_fetch=device.clear_device_log
+            )
+            if data:
+                data = data[::-1]
+                for i in data:
+                    employee = frappe.db.get_value("Employee", {"attendance_device_id": data.user_id}, "name")
+                    if not employee:
+                        frappe.log_error(message="Orphaned user id: {0}".format(data.user_id), title="Zkteco - Scheduler")
+                        continue
+                    if not frappe.db.exists("Employee Checkin", {"time": data.timestamp, "employee": employee}):
+                        attendance = frappe.new_doc("Employee Checkin")
+                        attendance.employee = employee
+                        attendance.time = data.timestamp
+                        attendance.log_type = punchMap[data.punch]
+                        attendance.device_id = device.device_id
+                        attendance.insert()
+        except Exception as e:
+            frappe.log_error(message=e,title="Zkteco - Scheduler")
