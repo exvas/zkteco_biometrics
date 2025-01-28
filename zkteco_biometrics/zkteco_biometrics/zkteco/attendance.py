@@ -53,7 +53,7 @@ def get_attendance_by_device():
             if data:
                 data = data[::-1]
                 for i in data:
-                    if not i.timestamp.strftime("%Y-%m-%d") == datetime.now().strftime("%Y-%m-%d"):
+                    if not i.timestamp.strftime("%Y-%m-%d") != datetime.now().strftime("%Y-%m-%d"):
                         frappe.log_error(message=i.timestamp.strftime("%Y-%m-%d").format(i.user_id), title="Zkteco - Scheduler")
                         break
                     employee = frappe.db.get_value("Employee", {"attendance_device_id": i.user_id}, "name")
