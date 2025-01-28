@@ -54,7 +54,7 @@ def get_attendance_by_device():
                     if not employee:
                         frappe.log_error(message="Orphaned user id: {0}".format(i.user_id), title="Zkteco - Scheduler")
                         continue
-                    if not frappe.db.exists("Employee Checkin", {"time": data.timestamp, "employee": employee}):
+                    if not frappe.db.exists("Employee Checkin", {"time": i.timestamp, "employee": employee}):
                         attendance = frappe.new_doc("Employee Checkin")
                         attendance.employee = employee
                         attendance.time = i.timestamp
