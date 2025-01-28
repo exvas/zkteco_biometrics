@@ -5,24 +5,18 @@ from datetime import datetime
 def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_device_on_fetch=False):
     conn = None
     try:
-        frappe.log_error(message="8",title="Zkteco - Get Attendance")
         zk = ZK(ip=ip, port=int(port), timeout=int(timeout))
-        frappe.log_error(message="10",title="Zkteco - Get Attendance")
         conn = zk.connect()
-        frappe.log_error(message="12",title="Zkteco - Get Attendance")
         disable_device = None
         attendance = None
         enable_device = None
         clear_attendance = None
         disable_device = conn.disable_device()
-        frappe.log_error(message="15",title="Zkteco - Get Attendance")
         attendance = conn.get_attendance()
-        frappe.log_error(message="16",title="Zkteco - Get Attendance")
         clear_attendance = ""
         if clear_from_device_on_fetch:
             clear_attendance = conn.clear_attendance()
         enable_device = conn.enable_device()
-        frappe.log_error(message=str(attendance[0]),title="Zkteco - Get Attendance")
         return {"attendance": attendance, "disable_device": disable_device, "clear_attendance": clear_attendance, "enable_device": enable_device}
     except Exception as e:
         frappe.log_error(message=e,title="Zkteco - Get Attendance")
@@ -53,7 +47,7 @@ def get_attendance_by_device():
             if data:
                 data = data[::-1]
                 for i in data:
-                    if not i.timestamp.strftime("%Y-%m-%d") != datetime.now().strftime("%Y-%m-%d"):
+                    if not i.timestamp.strftime("%Y-%m-%d") != "2025-01-28":
                         frappe.log_error(message=i.timestamp.strftime("%Y-%m-%d").format(i.user_id), title="Zkteco - Scheduler")
                         break
                     employee = frappe.db.get_value("Employee", {"attendance_device_id": i.user_id}, "name")
