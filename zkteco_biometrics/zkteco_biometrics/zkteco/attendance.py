@@ -5,18 +5,23 @@ from datetime import datetime
 def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_device_on_fetch=False):
     conn = None
     try:
+        frappe.log_error(message="8",title="Zkteco - Get Attendance")
         zk = ZK(ip=ip, port=int(port), timeout=int(timeout))
+        frappe.log_error(message="10",title="Zkteco - Get Attendance")
         conn = zk.connect()
         disable_device = None
         attendance = None
         enable_device = None
         clear_attendance = None
         disable_device = conn.disable_device()
+        frappe.log_error(message="15",title="Zkteco - Get Attendance")
         attendance = conn.get_attendance()
+        frappe.log_error(message="16",title="Zkteco - Get Attendance")
         clear_attendance = ""
         if clear_from_device_on_fetch:
             clear_attendance = conn.clear_attendance()
         enable_device = conn.enable_device()
+        frappe.log_error(message=str(attendance[0]),title="Zkteco - Get Attendance")
         return {"attendance": attendance, "disable_device": disable_device, "clear_attendance": clear_attendance, "enable_device": enable_device}
     except Exception as e:
         frappe.log_error(message=e,title="Zkteco - Get Attendance")
@@ -32,15 +37,16 @@ punchMap = {
 @frappe.whitelist()
 def get_attendance_by_device():
     devices = frappe.db.get_all("Devices", {"disable_data_capture": False})
-    for device in devices:
-        try:
-            data = get_attendance(
+    try:
+        for device in devices:
+            attn_data = get_attendance(
                 ip=device.ip,
                 port=4370,
                 timeout=30, 
                 device_id=device.device_id,
                 clear_from_device_on_fetch=device.clear_device_log
             )
+            data = attn_data.get("attendance")
             if data:
                 data = data[::-1]
                 for i in data:
@@ -58,5 +64,5 @@ def get_attendance_by_device():
                         attendance.log_type = punchMap[data.punch]
                         attendance.device_id = device.device_id
                         attendance.insert()
-        except Exception as e:
-            frappe.log_error(message=e,title="Zkteco - Scheduler")
+    except Exception as e:
+        frappe.log_error(message=e,title="Zkteco - Scheduler")
