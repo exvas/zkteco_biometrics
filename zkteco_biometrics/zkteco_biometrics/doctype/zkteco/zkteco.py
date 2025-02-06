@@ -8,24 +8,69 @@ from zkteco_biometrics.zkteco_biometrics.zkteco.attendance import get_attendance
 import json
 
 class ZKTeco(Document):
-	pass
+    pass
+
+punchMap = {
+    0: "IN",
+    1: "OUT"
+}
+
 @frappe.whitelist()
-def get_attendance_by_device(device_id, ip_address, clear_device_log:bool, port=4370, timeout=30):
-	# ip, port=4370, timeout=30, device_id=None, clear_from_device_on_fetch=False
-	data = get_attendance(
-			ip=ip_address,
-			port=4370,
-			timeout=timeout,
-			device_id=device_id,
-			clear_from_device_on_fetch=clear_device_log
-		)
+def get_attendance_by_date(device_id, ip_address, clear_device_log:bool, port=4370, timeout=30, date=None):
+    try:
+        frappe.enqueue(
+        	get_device_attendance,
+        	device_id=device_id,
+        	ip_address=ip_address,
+        	clear_device_log=clear_device_log,
+        	port=port,
+        	timeout=timeout,
+        	date=date,
+        	queue="long"
+        )
+        # get_device_attendance(
+        #     device_id=device_id,
+        #     ip_address=ip_address,
+        #     clear_device_log=clear_device_log,
+        #     port=port,
+        #     timeout=timeout,
+        #     date=date)
+    except Exception as e:
+        frappe.log_error(message=e,title="Zkteco - Data by date")
 
-	log_doc = frappe.new_doc("ZKTeco")
-	log_doc.title = datetime.now()
-	log = str(data.get("attendance")[-1].user_id) + " " + str(data.get("attendance")[-1].timestamp.strftime("%Y-%m-%d %H:%M:%S") + " " + str(data.get("attendance")[-1].punch))
-	log_doc.attendance = log
-	log_doc.disable_device = str(data.get("disable_device")) if data.get("disable_device") else ""
-	log_doc.enable_device = str(data.get("enable_device")) if data.get("disable_device") else ""
-	log_doc.clear_device = str(data.get("clear_attendance")) if data.get("clear_attendance") else ""
-	log_doc.insert()
-
+def get_device_attendance(device_id, ip_address, clear_device_log:bool, port=4370, timeout=30, date=None):
+    try:
+        data = attn = []
+        attn_data = get_attendance(
+            ip=ip_address,
+            port=4370,
+            timeout=timeout,
+            device_id=device_id,
+            clear_from_device_on_fetch=False
+        )
+        if attn_data:
+            data = attn_data.get("attendance")
+        if data:
+            data = data[::-1]
+            for i in data:
+                if i.timestamp.strftime("%Y-%m-%d") != date:
+                    continue
+                employee = frappe.db.get_value("Employee", {"attendance_device_id": i.user_id}, "name")
+                if not employee:
+                    frappe.log_error(message="Orphaned user id: {0}".format(i.user_id), title="Zkteco - Scheduler")
+                    continue
+                if not frappe.db.exists("Employee Checkin", {"time": i.timestamp, "employee": employee}):
+                    attn.append(i)
+        log = frappe.new_doc("ZKTeco")
+        log.title = datetime.now()
+        log.attendance = str(attn)
+        log.insert()
+                # attendance = frappe.new_doc("Employee Checkin")
+                # attendance.employee = employee
+                # attendance.time = i.timestamp
+                # attendance.log_type = punchMap[i.punch]
+                # attendance.device_id = device_id
+                # attendance.insert()
+    except Exception as e:
+        frappe.log_error(message=e,title="Zkteco - Data by date")
+    
