@@ -7,8 +7,14 @@ frappe.ui.form.on("Devices", {
             frappe.prompt([
                 {
                     fieldtype: "Date",
-                    label: __("Date"),
-                    fieldname: "date",
+                    label: __("From Date"),
+                    fieldname: "from_date",
+                    reqd: 1,
+                },
+                {
+                    fieldtype: "Date",
+                    label: __("To Date"),
+                    fieldname: "to_date",
                     reqd: 1,
                 }
             ],
@@ -24,7 +30,8 @@ frappe.ui.form.on("Devices", {
                         clear_device_log: frm.doc.clear_device_log,
                         port: 4370, 
                         timeout: 30,
-                        date: data.date
+                        from_date: data.from_date,
+                        to_date: data.to_date
                     },
                     callback(r){
                         frappe.msgprint("Completed")
