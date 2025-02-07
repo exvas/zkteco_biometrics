@@ -57,7 +57,7 @@ def get_device_attendance(device_id, ip_address, clear_device_log:bool, port=437
         if data and date_list:
             data = data[::-1]
             for i in data:
-                if i.timestamp.strftime("%Y-%m-%d") in date_list:
+                if not i.timestamp.strftime("%Y-%m-%d") in date_list:
                     continue
                 employee = frappe.db.get_value("Employee", {"attendance_device_id": i.user_id}, "name")
                 if not employee:
