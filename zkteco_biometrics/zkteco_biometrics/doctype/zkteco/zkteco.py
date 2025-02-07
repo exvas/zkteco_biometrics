@@ -59,8 +59,8 @@ def get_device_attendance(device_id, ip_address, clear_device_log:bool, port=437
                 if not employee:
                     frappe.log_error(message="Orphaned user id: {0}".format(i.user_id), title="Zkteco - Scheduler")
                     continue
-                if not frappe.db.exists("Employee Checkin", {"time": i.timestamp, "employee": employee}):
-                    attn.append(i)
+                # if not frappe.db.exists("Employee Checkin", {"time": i.timestamp, "employee": employee}):
+                attn.append(i)
         log = frappe.new_doc("ZKTeco")
         log.title = datetime.now()
         log.attendance = str(attn)
