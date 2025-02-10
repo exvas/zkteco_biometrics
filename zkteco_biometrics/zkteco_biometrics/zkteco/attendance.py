@@ -1,6 +1,7 @@
 import frappe
 from zk import ZK, const
 from datetime import datetime
+from frappe.utils.background_jobs import enqueue
 
 def get_attendance(ip:str, port=4370, timeout=30, device_id=None, clear_from_device_on_fetch=False):
     conn = None
@@ -29,9 +30,15 @@ punchMap = {
     1: "OUT"
 }
 
+def get_device_attendance():
+    frappe.enqueue(
+        get_attendance_by_device,
+        devices = frappe.db.get_all("Devices", {"disable_data_capture": False}, ["*"]),
+        queue="long"
+    )
+
 @frappe.whitelist()
-def get_attendance_by_device():
-    devices = frappe.db.get_all("Devices", {"disable_data_capture": False}, ["*"])
+def get_attendance_by_device(devices):
     try:
         new_data = []
         log = frappe.new_doc("ZKTeco")
