@@ -33,6 +33,10 @@ punchMap = {
 def get_attendance_by_device():
     devices = frappe.db.get_all("Devices", {"disable_data_capture": False}, ["*"])
     try:
+        new_data = []
+        log = frappe.new_doc("ZKTeco")
+        log.title = datetime.now()
+    
         for device in devices:
             attn_data = get_attendance(
                 ip=device.ip,
@@ -61,5 +65,8 @@ def get_attendance_by_device():
                         attendance.log_type = punchMap[i.punch]
                         attendance.device_id = device.device_id
                         attendance.insert()
+                        new_data.append(employee)
+        log.attendance = str("Get Attendance by Device: {0}".format(new_data))
+        log.insert()
     except Exception as e:
         frappe.log_error(message=e,title="Zkteco - Scheduler")
