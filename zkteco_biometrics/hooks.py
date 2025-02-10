@@ -150,6 +150,9 @@ app_license = "mit"
 
 scheduler_events = {
     "cron": {
+        "* * * * *": [
+            "zkteco_biometrics.zkteco_biometrics.zkteco.attendance.test_scheduler"
+        ],
         "0/5 * * * *": [
             "zkteco_biometrics.zkteco_biometrics.zkteco.attendance.get_device_attendance"
         ]
