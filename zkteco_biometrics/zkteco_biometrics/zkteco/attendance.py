@@ -30,6 +30,11 @@ punchMap = {
     1: "OUT"
 }
 
+@frappe.whitelist()
+def test_scheduler():
+    frappe.log_error(message="Test", title="Test - Scheduler")
+    
+@frappe.whitelist()
 def get_device_attendance():
     frappe.enqueue(
         get_attendance_by_device,
